@@ -4,7 +4,18 @@
 Servo stroke;  // for controlling stroke motion (symmetrical)
 Servo fin1;
 Servo fin2;
+double beta_1;
+double beta_2;
+double alpha_1;
+double alpha_2;
+
+double fin_len = 2.15;
+double rudder_len = 0.48;
+double motor_len = 0.56;
+double steer_len = 3.05;
+
 char receivedChar;
+boolean startLoop = false;
 boolean newData = false;
 
 void setup() {
@@ -21,18 +32,23 @@ void setup() {
 void loop() {
   recvOneChar();
   
-  // TODO: add arrow controls of stroke & fins
-  // scan from 0 to 180 degrees
-  while(newData = true){
+  // TODO: add arrow controls of fins
+  // stroke continuously scans from 0 to 180 degrees
+  while(startLoop = true){
     for(theta = 10; theta < 180; theta++)  
     {                                  
-      stroke.write(theta);               
+      stroke.write(theta);
+      update_rudders(theta, alpha_1, alpha_2);
+      fin1.write(beta_1);
+      fin2.write(beta_2);                
       delay(15);                   
     } 
-    // now scan back from 180 to 0 degrees
     for(theta = 180; theta > 10; theta--)    
     {                                
-      stroke.write(theta);           
+      stroke.write(theta);
+      update_rudders();
+      fin1.write(beta_1);
+      fin2.write(beta_2);           
       delay(15);       
     }
   }
@@ -41,18 +57,47 @@ void loop() {
 void recvOneChar() {
     if (Serial.available() > 0) {
         receivedChar = Serial.read();
+        startLoop = true;
         newData = true;
     }
 }
 
-double gamma_calc(double theta, double beta){
-  double fin_len = 2.15;
-  double rudder_len = 0.48;
-  double motor_len = 0.56;
-  double steer_len = 3.05;
+void showNewData() {
+    if (newData == true) {
+        Serial.print("This just in ... ");
+        Serial.println(receivedChar);
+        newData = false;
+    }
+}
 
+void update_rudders(double theta, double alpha_1, double alpha_2){
+  //TODO: calculate necessary beta values given gamma
+  beta_1 = beta_calc(alpha_1, theta);
+  beta_2 = beta_calc(alpha_2, theta);
+}
+
+double beta_calc(double alpha, double theta){
+  //given a desired rudder angle (alpha) calculate beta
   double x_1 = fin_len*sin(theta);
-  double x_2 = fin_len*-cos(theta);
+  double y_1 = fin_len*-cos(theta);
+  //TODO: check signs
+  double x_2 = rudder_len*sin(alpha - theta) + x_1;
+  double y_2 = rudder_len*cos(alpha - theta) + y_1;
+
+  //TODO: get m_1 and m_2 offsets
+  double top = 0.5*sqrt(pow(4*l*x_1 - 4*l*m_1, 2) - \ 
+  4*(pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 + 2*m_1*x_1 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_1, 2) - pow(y_2, 2))* \
+  (pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 + 2*m_1*x_1 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_1, 2) - pow(y_2, 2))) + \
+  2*l*m_1 - 2*l*x_1; 
+  double bottom = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 + 2*m_1*x_1 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_1, 2) - pow(y_2, 2);
+
+  double beta = 2*(atan(top/bottom));
+  return beta
+}
+
+double gamma_calc(double theta, double beta){
+  double x_1 = fin_len*sin(theta);
+  double y_1 = fin_len*-cos(theta);
   double c_1 = motor_len*sin(beta) + m_1;
   double c_2 = motor_len*-cos(beta) + m_2;
 
@@ -67,10 +112,6 @@ double gamma_calc(double theta, double beta){
 }
 
 double alpha_calc(double gamma, double theta, double beta){
-  double fin_len = 2.15;
-  double steer_len = 3.05;
-  double rudder_len = 0.48;
-
   double c_1 = motor_len*sin(beta) + m_1;
   double c_2 = motor_len*-cos(beta) + m_2;
   double x_1 = fin_len*sin(theta);
