@@ -4,6 +4,8 @@
 Servo stroke;  // for controlling stroke motion (symmetrical)
 Servo fin1;
 Servo fin2;
+char receivedChar;
+boolean newData = false;
 
 void setup() {
   // put your setup code here, to run once:
@@ -17,21 +19,30 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  delay(1000);
+  recvOneChar();
+  
   // TODO: add arrow controls of stroke & fins
   // scan from 0 to 180 degrees
-  for(theta = 10; theta < 180; theta++)  
-  {                                  
-    stroke.write(angle);               
-    delay(15);                   
-  } 
-  // now scan back from 180 to 0 degrees
-  for(theta = 180; theta > 10; theta--)    
-  {                                
-    stroke.write(angle);           
-    delay(15);       
+  while(newData = true){
+    for(theta = 10; theta < 180; theta++)  
+    {                                  
+      stroke.write(theta);               
+      delay(15);                   
+    } 
+    // now scan back from 180 to 0 degrees
+    for(theta = 180; theta > 10; theta--)    
+    {                                
+      stroke.write(theta);           
+      delay(15);       
+    }
   }
+}
+
+void recvOneChar() {
+    if (Serial.available() > 0) {
+        receivedChar = Serial.read();
+        newData = true;
+    }
 }
 
 double gamma_calc(double theta, double beta){
@@ -50,7 +61,7 @@ double gamma_calc(double theta, double beta){
   double g = pow(rudder_len, 2) - pow(f, 2) - pow(h, 2);
   double l = steer_len;
 
-  gamma = 2*atan((sqrt(pow(l, 2)*(4*pow(f, 2) + 4*pow(h, 2) - pow(l, 2)) - pow(g, 2) + 2*g*pow(l, 2)) + 2*f*l) /
+  double gamma = 2*atan((sqrt(pow(l, 2)*(4*pow(f, 2) + 4*pow(h, 2) - pow(l, 2)) - pow(g, 2) + 2*g*pow(l, 2)) + 2*f*l) /
   (g - l*(2*h + l))); 
   return gamma;
 }
