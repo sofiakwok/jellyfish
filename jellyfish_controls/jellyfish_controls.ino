@@ -6,8 +6,8 @@ Servo fin1;
 Servo fin2;
 double beta_1;
 double beta_2;
-double alpha_1;
-double alpha_2;
+double alpha_1 = 0;
+double alpha_2 = 0;
 
 double fin_len = 2.15;
 double rudder_len = 0.48;
@@ -34,9 +34,11 @@ void loop() {
   
   // TODO: add arrow controls of fins
   // stroke continuously scans from 0 to 180 degrees
-  while(startLoop = true){
+  while(startLoop){
     for(theta = 10; theta < 180; theta++)  
-    {                                  
+    {                      
+      recvOneChar();
+      showNewData();            
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
       fin1.write(beta_1);
@@ -46,7 +48,7 @@ void loop() {
     for(theta = 180; theta > 10; theta--)    
     {                                
       stroke.write(theta);
-      update_rudders();
+      update_rudders(theta, alpha_1, alpha_2);
       fin1.write(beta_1);
       fin2.write(beta_2);           
       delay(15);       
@@ -63,11 +65,30 @@ void recvOneChar() {
 }
 
 void showNewData() {
-    if (newData == true) {
-        Serial.print("This just in ... ");
-        Serial.println(receivedChar);
-        newData = false;
-    }
+  int threshold = 45;
+  if (newData == true) {
+      Serial.print("This just in ... ");
+      Serial.println(receivedChar);
+      if (receivedChar == 's'){
+        alpha_1 -= 10;
+      } else if (receivedChar == 'w')
+      {
+        alpha_1 += 10;
+      } else if (receivedChar == 'i')
+      {
+        alpha_2 += 10;
+      } else if (receivedChar == 'k')
+      {
+        alpha_2 -= 10;
+      }
+      if (alpha_1 >= threshold) {
+        alpha_1 = threshold;
+      }
+      if (alpha_2 >= threshold) {
+        alpha_2 = threshold;
+      }
+      newData = false;
+  }
 }
 
 void update_rudders(double theta, double alpha_1, double alpha_2){
@@ -85,11 +106,11 @@ double beta_calc(double alpha, double theta){
   double y_2 = rudder_len*cos(alpha - theta) + y_1;
 
   //TODO: get m_1 and m_2 offsets
-  double top = 0.5*sqrt(pow(4*l*x_1 - 4*l*m_1, 2) - \ 
-  4*(pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 + 2*m_1*x_1 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_1, 2) - pow(y_2, 2))* \
-  (pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 + 2*m_1*x_1 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_1, 2) - pow(y_2, 2))) + \
-  2*l*m_1 - 2*l*x_1; 
-  double bottom = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 + 2*m_1*x_1 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_1, 2) - pow(y_2, 2);
+  double top = 0.5*sqrt(pow(4*l*x_2 - 4*l*m_1, 2) - \ 
+  4*(pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 + 2*m_1*x_2 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_2, 2) - pow(y_2, 2))* \
+  (pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 + 2*m_1*x_2 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_2, 2) - pow(y_2, 2))) + \
+  2*l*m_1 - 2*l*x_2; 
+  double bottom = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 + 2*m_1*x_2 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_2, 2) - pow(y_2, 2);
 
   double beta = 2*(atan(top/bottom));
   return beta
