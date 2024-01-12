@@ -8,6 +8,7 @@ double beta_1;
 double beta_2;
 double alpha_1 = 0;
 double alpha_2 = 0;
+int theta = 0;
 
 double fin_len = 2.15;
 double rudder_len = 0.48;
@@ -65,7 +66,7 @@ void recvOneChar() {
 }
 
 void showNewData() {
-  int threshold = 45;
+  int threshold = 90;
   if (newData == true) {
       Serial.print("This just in ... ");
       Serial.println(receivedChar);
@@ -81,11 +82,13 @@ void showNewData() {
       {
         alpha_2 -= 10;
       }
-      if (alpha_1 >= threshold) {
-        alpha_1 = threshold;
+      if (abs(alpha_1) >= threshold) {
+        int sign = (alpha_1 > 0) - (alpha_1 < 0);
+        alpha_1 = threshold * sign;
       }
-      if (alpha_2 >= threshold) {
-        alpha_2 = threshold;
+      if (abs(alpha_2) >= threshold) {
+        int sign = (alpha_2 > 0) - (alpha_2 < 0);
+        alpha_2 = threshold * sign;
       }
       newData = false;
   }
@@ -98,6 +101,10 @@ void update_rudders(double theta, double alpha_1, double alpha_2){
 }
 
 double beta_calc(double alpha, double theta){
+  double l = 3.05;
+  double d = 1.0;
+  double m_1 = 0.5;
+  double m_2 = 0.5;
   //given a desired rudder angle (alpha) calculate beta
   double x_1 = fin_len*sin(theta);
   double y_1 = fin_len*-cos(theta);
@@ -113,10 +120,12 @@ double beta_calc(double alpha, double theta){
   double bottom = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 + 2*m_1*x_2 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_2, 2) - pow(y_2, 2);
 
   double beta = 2*(atan(top/bottom));
-  return beta
+  return beta;
 }
 
 double gamma_calc(double theta, double beta){
+  double m_1 = 0.5;
+  double m_2 = 0.5;
   double x_1 = fin_len*sin(theta);
   double y_1 = fin_len*-cos(theta);
   double c_1 = motor_len*sin(beta) + m_1;
@@ -133,14 +142,15 @@ double gamma_calc(double theta, double beta){
 }
 
 double alpha_calc(double gamma, double theta, double beta){
+  double m_1 = 0.5;
+  double m_2 = 0.5;
   double c_1 = motor_len*sin(beta) + m_1;
   double c_2 = motor_len*-cos(beta) + m_2;
   double x_1 = fin_len*sin(theta);
-  double x_2 = fin_len*-cos(theta);
+  double y_1 = fin_len*-cos(theta);
   double x_2 = steer_len * sin(gamma) + c_1;
   double y_2 = steer_len * -cos(gamma) + c_2;
 
   double alpha = -asin((x_2 - x_1)/rudder_len) + theta;
   return alpha;
 }
-
