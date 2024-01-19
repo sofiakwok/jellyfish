@@ -32,6 +32,10 @@ void setup() {
 
 void loop() {
   recvOneChar();
+  //go to max stroke diameter (180) gently
+  for(theta = 0; theta < 180; theta++){
+    
+  }
   
   // TODO: add arrow controls of fins
   // stroke continuously scans from 0 to 180 degrees
