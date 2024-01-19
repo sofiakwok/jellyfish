@@ -4,6 +4,7 @@
 Servo stroke;  // for controlling stroke motion (symmetrical)
 Servo fin1;
 Servo fin2;
+//beta_1 is left (looking from below), beta_2 is right 
 double beta_1;
 double beta_2;
 double alpha_1 = 0;
@@ -16,8 +17,8 @@ double motor_len = 0.56;
 double steer_len = 3.05;
 
 char receivedChar;
-boolean startLoop = false;
-boolean newData = false;
+bool startLoop = false;
+bool newData = false;
 
 void setup() {
   // put your setup code here, to run once:
@@ -33,14 +34,12 @@ void setup() {
 void loop() {
   recvOneChar();
   //go to max stroke diameter (180) gently
-  for(theta = 0; theta < 180; theta++){
+  /*for(theta = 0; theta < 180; theta++){
     
-  }
-  
-  // TODO: add arrow controls of fins
-  // stroke continuously scans from 0 to 180 degrees
+  }*/
+    // stroke continuously scans from 0 to 180 degrees
   while(startLoop){
-    for(theta = 10; theta < 180; theta++)  
+    for(theta = 10; theta < 360; theta++)  
     {                      
       recvOneChar();
       showNewData();            
@@ -48,15 +47,15 @@ void loop() {
       update_rudders(theta, alpha_1, alpha_2);
       fin1.write(beta_1);
       fin2.write(beta_2);                
-      delay(15);                   
+      delay(5);                   
     } 
-    for(theta = 180; theta > 10; theta--)    
+    for(theta = 360; theta > 10; theta--)    
     {                                
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
       fin1.write(beta_1);
       fin2.write(beta_2);           
-      delay(15);       
+      delay(5);       
     }
   }
 }
@@ -100,15 +99,23 @@ void showNewData() {
 
 void update_rudders(double theta, double alpha_1, double alpha_2){
   //TODO: calculate necessary beta values given gamma
-  beta_1 = beta_calc(alpha_1, theta);
-  beta_2 = beta_calc(alpha_2, theta);
+  beta_1 = beta_calc(alpha_1, theta, bool left=true);
+  beta_2 = beta_calc(alpha_2, theta, bool left=false);
 }
 
-double beta_calc(double alpha, double theta){
+double beta_calc(double alpha, double theta, bool left){
   double l = 3.05;
   double d = 1.0;
-  double m_1 = 0.5;
-  double m_2 = 0.5;
+  double m_1 = 0;
+  double m_2 = 0;
+  if (left){
+    m_1 = -0.153543;
+    m_2 = 0.405512;
+  } else {
+    m_1 = 0.074803;
+    m_2 = 0.405512;
+  }
+  
   //given a desired rudder angle (alpha) calculate beta
   double x_1 = fin_len*sin(theta);
   double y_1 = fin_len*-cos(theta);
