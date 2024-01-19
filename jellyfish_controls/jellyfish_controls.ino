@@ -104,33 +104,49 @@ void update_rudders(double theta, double alpha_1, double alpha_2){
 }
 
 double beta_calc(double alpha, double theta, bool left){
-  double l = 3.05;
-  double d = 1.0;
+  double d = 3.052717;
+  double l = 0.568898;
   double m_1 = 0;
   double m_2 = 0;
+  //given a desired rudder angle (alpha) calculate beta
+  double x_1 = 0;
+  double y_1 = 0;
+  double x_2 = 0;
+  double y_2 = 0;
+
+  double a = 0;
+  double b = 0;
+  double c = 0;
+  double top = 0;
+  double bottom = 0;
+
   if (left){
     m_1 = -0.153543;
     m_2 = 0.405512;
+    x_1 = -fin_len*sin(theta);
+    y_1 = -fin_len*cos(theta);
+    x_2 = -rudder_len*sin(alpha + theta) + x_1;
+    y_2 = -rudder_len*cos(alpha + theta) + y_1;
+    a = pow(4*l*m_1 - 4*l*x_2, 2);
+    b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    top = sqrt(a - 4*b*c) - 2*l*m_1 + 2*l*x_2; 
+    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   } else {
     m_1 = 0.074803;
     m_2 = 0.405512;
+    x_1 = fin_len*sin(theta);
+    y_1 = -fin_len*cos(theta);
+    x_2 = rudder_len*sin(alpha + theta) + x_1;
+    y_2 = -rudder_len*cos(alpha + theta) + y_1;
+    a = pow(4*l*x_2 - 4*l*m_1, 2);
+    b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    top = sqrt(a - 4*b*c) + 2*l*m_1 - 2*l*x_2; 
+    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
-  
-  //given a desired rudder angle (alpha) calculate beta
-  double x_1 = fin_len*sin(theta);
-  double y_1 = fin_len*-cos(theta);
-  //TODO: check signs
-  double x_2 = rudder_len*sin(alpha - theta) + x_1;
-  double y_2 = rudder_len*cos(alpha - theta) + y_1;
 
-  //TODO: get m_1 and m_2 offsets
-  double top = 0.5*sqrt(pow(4*l*x_2 - 4*l*m_1, 2) - \ 
-  4*(pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 + 2*m_1*x_2 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_2, 2) - pow(y_2, 2))* \
-  (pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 + 2*m_1*x_2 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_2, 2) - pow(y_2, 2))) + \
-  2*l*m_1 - 2*l*x_2; 
-  double bottom = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 + 2*m_1*x_2 + 2*m_2*y_2 - pow(m_1, 2) - pow(m_2, 2) - pow(x_2, 2) - pow(y_2, 2);
-
-  double beta = 2*(atan(top/bottom));
+  double beta = 2*(atan(0.5*top/bottom));
   return beta;
 }
 
