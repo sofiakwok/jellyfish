@@ -7,6 +7,7 @@ Servo fin2;
 //beta_1 is left (looking from below), beta_2 is right 
 double beta_1;
 double beta_2;
+//alpha: angle offset of rudders from fins (radians)
 double alpha_1 = 0;
 double alpha_2 = 0;
 int theta = 0;
@@ -74,16 +75,16 @@ void showNewData() {
       Serial.print("This just in ... ");
       Serial.println(receivedChar);
       if (receivedChar == 's'){
-        alpha_1 -= 10;
+        alpha_1 -= 0.175;
       } else if (receivedChar == 'w')
       {
-        alpha_1 += 10;
+        alpha_1 += 0.175;
       } else if (receivedChar == 'i')
       {
-        alpha_2 += 10;
+        alpha_2 += 0.175;
       } else if (receivedChar == 'k')
       {
-        alpha_2 -= 10;
+        alpha_2 -= 0.175;
       }
       if (abs(alpha_1) >= threshold) {
         int sign = (alpha_1 > 0) - (alpha_1 < 0);
@@ -98,17 +99,19 @@ void showNewData() {
 }
 
 void update_rudders(double theta, double alpha_1, double alpha_2){
-  //TODO: calculate necessary beta values given gamma
   beta_1 = beta_calc(alpha_1, theta, bool left=true);
   beta_2 = beta_calc(alpha_2, theta, bool left=false);
 }
 
 double beta_calc(double alpha, double theta, bool left){
+  //all measurements in inches
   double d = 3.052717;
   double l = 0.568898;
+  // offset of servo from fin rotational axis (m_1 = x, m_2 = y)
+  // assumes fin rotational axis is at (0, 0)
   double m_1 = 0;
   double m_2 = 0;
-  //given a desired rudder angle (alpha) calculate beta
+  //given a desired rudder angle (alpha) calculate beta (fin servo angle)
   double x_1 = 0;
   double y_1 = 0;
   double x_2 = 0;
@@ -125,7 +128,8 @@ double beta_calc(double alpha, double theta, bool left){
     m_2 = 0.405512;
     x_1 = -fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    x_2 = -rudder_len*sin(alpha + theta) + x_1;
+    //TODO: check signs on x_2 and y_2
+    x_2 = rudder_len*sin(alpha + theta) + x_1;
     y_2 = -rudder_len*cos(alpha + theta) + y_1;
     a = pow(4*l*m_1 - 4*l*x_2, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
@@ -145,11 +149,13 @@ double beta_calc(double alpha, double theta, bool left){
     top = sqrt(a - 4*b*c) + 2*l*m_1 - 2*l*x_2; 
     bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
-
   double beta = 2*(atan(0.5*top/bottom));
+  //TODO: add sanity check for beta
   return beta;
 }
 
+
+//unnecessary functions
 double gamma_calc(double theta, double beta){
   double m_1 = 0.5;
   double m_2 = 0.5;
