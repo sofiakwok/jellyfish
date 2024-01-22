@@ -8,8 +8,10 @@ Servo fin2;
 double beta_1;
 double beta_2;
 //alpha: angle offset of rudders from fins (radians)
+//left = negative, right = positive
 double alpha_1 = 0;
 double alpha_2 = 0;
+//theta: angle of middle servo, controls fin angles
 int theta = 0;
 
 double fin_len = 2.15;
@@ -99,8 +101,9 @@ void showNewData() {
 }
 
 void update_rudders(double theta, double alpha_1, double alpha_2){
-  beta_1 = beta_calc(alpha_1, theta, bool left=true);
-  beta_2 = beta_calc(alpha_2, theta, bool left=false);
+  bool left;
+  beta_1 = beta_calc(alpha_1, theta, left=true);
+  beta_2 = beta_calc(alpha_2, theta, left=false);
 }
 
 double beta_calc(double alpha, double theta, bool left){
@@ -128,14 +131,13 @@ double beta_calc(double alpha, double theta, bool left){
     m_2 = 0.405512;
     x_1 = -fin_len*sin(theta);
     y_1 = -fin_len*cos(theta);
-    //TODO: check signs on x_2 and y_2
-    x_2 = rudder_len*sin(alpha + theta) + x_1;
-    y_2 = -rudder_len*cos(alpha + theta) + y_1;
+    x_2 = rudder_len*sin(alpha - theta) + x_1;
+    y_2 = -rudder_len*cos(alpha - theta) + y_1;
     a = pow(4*l*m_1 - 4*l*x_2, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     top = sqrt(a - 4*b*c) - 2*l*m_1 + 2*l*x_2; 
-    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - bool(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   } else {
     m_1 = 0.074803;
     m_2 = 0.405512;
@@ -147,7 +149,7 @@ double beta_calc(double alpha, double theta, bool left){
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     top = sqrt(a - 4*b*c) + 2*l*m_1 - 2*l*x_2; 
-    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - bool(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
   double beta = 2*(atan(0.5*top/bottom));
   //TODO: add sanity check for beta
