@@ -28,9 +28,6 @@ void setup() {
   stroke.attach(9);  // attaches the servo on pin 9 to the servo object
   fin1.attach(10);
   fin2.attach(11);
-  stroke.write(0);
-  fin1.write(0);
-  fin2.write(0);
   Serial.begin(9600);
 }
 
@@ -42,20 +39,28 @@ void loop() {
   }*/
     // stroke continuously scans from 0 to 180 degrees
   while(startLoop){
+    Serial.print("\n Loop 1 \n");
     for(theta = 10; theta < 360; theta++)  
-    {                      
+    {       
       recvOneChar();
       showNewData();            
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
+      Serial.print(beta_1);
+      Serial.print(" ");
       fin1.write(beta_1);
       fin2.write(beta_2);                
       delay(5);                   
     } 
+    Serial.print("\n Loop 2 \n");
     for(theta = 360; theta > 10; theta--)    
-    {                                
+    {
+      recvOneChar();
+      showNewData();                             
       stroke.write(theta);
       update_rudders(theta, alpha_1, alpha_2);
+      Serial.print(beta_2);
+      Serial.print(" ");
       fin1.write(beta_1);
       fin2.write(beta_2);           
       delay(5);       
@@ -106,7 +111,10 @@ void update_rudders(double theta, double alpha_1, double alpha_2){
   beta_2 = beta_calc(alpha_2, theta, left=false);
 }
 
-double beta_calc(double alpha, double theta, bool left){
+double beta_calc(double alpha_deg, double theta_deg, bool left){
+  //convert degrees to radians
+  double theta = theta_deg * 3.1415/180;
+  double alpha = alpha_deg * 3.1415/180;
   //all measurements in inches
   double d = 3.052717;
   double l = 0.568898;
@@ -136,8 +144,9 @@ double beta_calc(double alpha, double theta, bool left){
     a = pow(4*l*m_1 - 4*l*x_2, 2);
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    //TODO: add checker to see if a - 4*b*c is negative and if so switch to using other root
     top = sqrt(a - 4*b*c) - 2*l*m_1 + 2*l*x_2; 
-    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - bool(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   } else {
     m_1 = 0.074803;
     m_2 = 0.405512;
@@ -149,43 +158,11 @@ double beta_calc(double alpha, double theta, bool left){
     b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
     top = sqrt(a - 4*b*c) + 2*l*m_1 - 2*l*x_2; 
-    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - bool(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    bottom = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
   }
   double beta = 2*(atan(0.5*top/bottom));
   //TODO: add sanity check for beta
-  return beta;
-}
-
-
-//unnecessary functions
-double gamma_calc(double theta, double beta){
-  double m_1 = 0.5;
-  double m_2 = 0.5;
-  double x_1 = fin_len*sin(theta);
-  double y_1 = fin_len*-cos(theta);
-  double c_1 = motor_len*sin(beta) + m_1;
-  double c_2 = motor_len*-cos(beta) + m_2;
-
-  double f = c_1 - x_1;
-  double h = c_2 - y_1;
-  double g = pow(rudder_len, 2) - pow(f, 2) - pow(h, 2);
-  double l = steer_len;
-
-  double gamma = 2*atan((sqrt(pow(l, 2)*(4*pow(f, 2) + 4*pow(h, 2) - pow(l, 2)) - pow(g, 2) + 2*g*pow(l, 2)) + 2*f*l) /
-  (g - l*(2*h + l))); 
-  return gamma;
-}
-
-double alpha_calc(double gamma, double theta, double beta){
-  double m_1 = 0.5;
-  double m_2 = 0.5;
-  double c_1 = motor_len*sin(beta) + m_1;
-  double c_2 = motor_len*-cos(beta) + m_2;
-  double x_1 = fin_len*sin(theta);
-  double y_1 = fin_len*-cos(theta);
-  double x_2 = steer_len * sin(gamma) + c_1;
-  double y_2 = steer_len * -cos(gamma) + c_2;
-
-  double alpha = -asin((x_2 - x_1)/rudder_len) + theta;
-  return alpha;
+  //convert back to degrees 
+  double beta_deg = 180/3.1415*beta;
+  return beta_deg;
 }
