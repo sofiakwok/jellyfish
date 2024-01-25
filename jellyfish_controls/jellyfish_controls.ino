@@ -43,7 +43,7 @@ void loop() {
     // stroke continuously scans from 0 to 180 degrees
   while(startLoop){
     Serial.print("\n Loop 1 \n");
-    for(theta = 10; theta < 360; theta++)  
+    for(theta = 0; theta < 180; theta++)  
     {       
       recvOneChar();
       showNewData();            
@@ -56,7 +56,7 @@ void loop() {
       delay(5);                   
     } 
     Serial.print("\n Loop 2 \n");
-    for(theta = 360; theta > 10; theta--)    
+    for(theta = 180; theta > 0; theta--)    
     {
       recvOneChar();
       showNewData();                             
@@ -118,6 +118,7 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   //convert degrees to radians and account for theta gear ratio
   double theta = theta_deg * 3.1415/180/2;
   double alpha = alpha_deg * 3.1415/180;
+  //Serial.print((String)"(theta: " + theta + " alpha: " + alpha + ")");
   //all measurements in inches
   double d = 3.052717;
   double l = 0.568898;
@@ -153,8 +154,8 @@ double beta_calc(double alpha_deg, double theta_deg, bool left){
   } else {
     m_1 = 0.074803;
     m_2 = 0.405512;
-    x_1 = fin_len*sin(3.1415 - theta);
-    y_1 = -fin_len*cos(3.1415 - theta);
+    x_1 = fin_len*sin(theta);
+    y_1 = -fin_len*cos(theta);
     x_2 = rudder_len*sin(alpha + theta) + x_1;
     y_2 = -rudder_len*cos(alpha + theta) + y_1;
     a = pow(4*l*x_2 - 4*l*m_1, 2);
