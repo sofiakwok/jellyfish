@@ -25,9 +25,12 @@ bool newData = false;
 
 void setup() {
   // put your setup code here, to run once:
-  stroke.attach(9);  // attaches the servo on pin 9 to the servo object
+  stroke.attach(9); 
   fin1.attach(10);
   fin2.attach(11);
+  stroke.write(0);
+  fin1.write(180);
+  fin2.write(0);
   Serial.begin(9600);
 }
 
@@ -48,7 +51,7 @@ void loop() {
       update_rudders(theta, alpha_1, alpha_2);
       Serial.print(beta_1);
       Serial.print(" ");
-      fin1.write(beta_1);
+      fin1.write(180 - beta_1);
       fin2.write(beta_2);                
       delay(5);                   
     } 
@@ -61,7 +64,7 @@ void loop() {
       update_rudders(theta, alpha_1, alpha_2);
       Serial.print(beta_2);
       Serial.print(" ");
-      fin1.write(beta_1);
+      fin1.write(180 - beta_1);
       fin2.write(beta_2);           
       delay(5);       
     }
