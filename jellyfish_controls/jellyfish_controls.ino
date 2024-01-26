@@ -43,7 +43,7 @@ void loop() {
     // stroke continuously scans from 0 to 180 degrees
   while(startLoop){
     Serial.print("\n Loop 1 \n");
-    for(theta = 0; theta < 180; theta++)  
+    for(theta = 0; theta < 175; theta++)  
     {       
       recvOneChar();
       showNewData();            
@@ -56,7 +56,7 @@ void loop() {
       delay(5);                   
     } 
     Serial.print("\n Loop 2 \n");
-    for(theta = 180; theta > 0; theta--)    
+    for(theta = 175; theta > 0; theta--)    
     {
       recvOneChar();
       showNewData();                             
