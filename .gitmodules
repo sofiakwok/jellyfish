@@ -1,0 +1,3 @@
+[submodule "jellyfish-arduino"]
+	path = jellyfish-arduino
+	url = https://github.com/sofiakwok/jellyfish-arduino.git
