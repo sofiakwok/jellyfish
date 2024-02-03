@@ -37,7 +37,7 @@ xlabel('X')
 ylabel('Y')
 zlabel('Z')
 
-%% 
+%% fin1 beta
 %graphing beta over the feasible range that x1, y1 can be at
 
 f = 2.15178; % fin length
@@ -47,7 +47,7 @@ l = 0.483608; %rudder length
 m_1 = -0.153543;
 m_2 = 0.405512;
 
-theta = 0;% linspace(0, 3.1415/2, 100); %all trig in radians
+theta = linspace(0, 3.1415/2, 100); %all trig in radians
 
 x_1 = -f*sin(theta);
 y_1 = -f*cos(theta);
@@ -70,8 +70,43 @@ deg_beta = beta * 180 / 3.1415;
 
 figure(3);
 hold on
-plot(theta, beta)
+plot(theta, deg_beta)
 xlabel('\theta')
 ylabel('\beta')
 
+%% fin2 beta
+%graphing beta over the feasible range that x1, y1 can be at
+
+f = 2.15178; % fin length
+d = 3.052717; % steering length
+l = 0.483608; %rudder length
+
+m_1 = 0.074803;
+m_2 = 0.405512;
+
+theta = linspace(0, 3.1415/2, 100); %all trig in radians
+
+x_1 = f*sin(theta);
+y_1 = -f*cos(theta);
+
+% calculate beta for alpha to stay at 0 throughout cycle
+% x_2 = l* sin(theta + alpha) + x_1;
+% y_2 = -l * cos(theta + alpha) + y_1;
+x_2 = (l + f) * sin(theta);
+y_2 = -(l + f) * cos(theta);
+
+a = (4*l*x_2 - 4*l*m_1).^2;
+b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
+c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
+top = sqrt(a - 4.*b.*c) - 2*l*m_1 + 2*l.*x_2; 
+bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
+beta = 2*(atan(0.5*top./bottom));
+
+deg_beta = beta * 180 / 3.1415;
+
+figure(3);
+hold on
+plot(theta, deg_beta)
+xlabel('\theta')
+ylabel('\beta')
 
