@@ -45,7 +45,7 @@ d = 3.052717; % steering length
 l = 0.56; %servo arm length
 r = 0.483608; %rudder length
 
-m_1 = 0.437008;
+m_1 = -0.2;%437008;
 m_2 = 0.405512;
 
 theta = linspace(0, 3.1415/2, 100); %all trig in radians
@@ -66,12 +66,16 @@ c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.
 top = 0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2; 
 bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
 beta = 2*(atan(top./bottom));
+top_2 = -0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2;
+beta_2 = 2*(atan(top_2./bottom));
 
 deg_beta = beta * 180 / 3.1415;
+deg_beta_2 = beta_2 * 180 / 3.1415;
 
 figure(3);
 hold on
 plot(theta*180/3.1415, deg_beta)
+plot(theta*180/3.1415, deg_beta_2)
 xlabel('\theta')
 ylabel('\beta')
 
@@ -84,7 +88,7 @@ l = 0.56; %servo arm length
 r = 0.483608; %rudder length
 
 m_1 = -0.276079;
-m_2 = 0.405512;
+m_2 = 0.405512; %2
 
 theta = linspace(0, 3.1415/2, 100); %all trig in radians
 
@@ -103,12 +107,16 @@ c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.
 top = real(0.5*sqrt(a - 4.*b.*c)) - 2*l*m_1 + 2*l.*x_2; 
 bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
 beta = 2*(atan(top./bottom));
+top_2 = -0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2;
+beta_2 = 2*(atan(top_2./bottom));
 
 deg_beta = beta * 180 / 3.1415;
+deg_beta_2 = beta_2 * 180 / 3.1415;
 
 figure(3);
 hold on
 plot(theta*180/3.1415, deg_beta)
+plot(theta*180/3.1415, deg_beta_2)
 xlabel('\theta')
 ylabel('\beta')
 
