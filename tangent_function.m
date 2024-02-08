@@ -42,7 +42,8 @@ zlabel('Z')
 
 f = 2.15178; % fin length
 d = 3.052717; % steering length
-l = 0.483608; %rudder length
+l = 0.56; %servo arm length
+r = 0.483608; %rudder length
 
 m_1 = 0.437008;
 m_2 = 0.405512;
@@ -53,19 +54,18 @@ x_1 = f*sin(theta);
 y_1 = -f*cos(theta);
 
 % calculate beta for alpha to stay at 0 throughout cycle
-alpha = 10/180*3.1415;
-x_2 = l* sin(theta + alpha) + x_1;
-y_2 = -l * cos(theta + alpha) + y_1;
+alpha = 0/180*3.1415;
+x_2 = r*sin(theta + alpha) + x_1;
+y_2 = -r*cos(theta + alpha) + y_1;
 % x_2 = (l + f) * sin(theta);
 % y_2 = -(l + f) * cos(theta);
 
-% a = (4*l*m_1 - 4*l*x_2).^2;
 a = (4*l*x_2 - 4*l*m_1).^2;
 b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
 c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-top = sqrt(abs(a - 4.*b.*c)) - 2*l*m_1 + 2*l.*x_2; 
+top = 0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2; 
 bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-beta = 2*(atan(0.5*top./bottom));
+beta = 2*(atan(top./bottom));
 
 deg_beta = beta * 180 / 3.1415;
 
@@ -80,7 +80,8 @@ ylabel('\beta')
 
 f = 2.15178; % fin length
 d = 3.052717; % steering length
-l = 0.483608; %rudder length
+l = 0.56; %servo arm length
+r = 0.483608; %rudder length
 
 m_1 = -0.276079;
 m_2 = 0.405512;
@@ -91,17 +92,17 @@ x_1 = -f*sin(theta);
 y_1 = -f*cos(theta);
 
 % calculate beta for alpha to stay at 0 throughout cycle
-x_2 = -l* sin(theta + alpha) + x_1;
-y_2 = -l * cos(theta + alpha) + y_1;
+x_2 = -r* sin(theta + alpha) + x_1;
+y_2 = -r * cos(theta + alpha) + y_1; 
 % x_2 = (l + f) * sin(theta);
 % y_2 = -(l + f) * cos(theta);
 
 a = (4*l*m_1 - 4*l*x_2).^2;
 b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
 c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-top = sqrt(abs(a - 4.*b.*c)) - 2*l*m_1 + 2*l.*x_2; 
+top = real(0.5*sqrt(a - 4.*b.*c)) - 2*l*m_1 + 2*l.*x_2; 
 bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-beta = 2*(atan(0.5*top./bottom));
+beta = 2*(atan(top./bottom));
 
 deg_beta = beta * 180 / 3.1415;
 
