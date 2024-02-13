@@ -213,8 +213,8 @@ d = 2.45; %3.052717; % steering length
 l = 0.56; %servo arm length
 r = 0.25; %0.483608; %rudder length
 
-m_1 = -0.242625;
-m_2 = 0.405512;
+m_1 = -0.311024;
+m_2 = 0.405394;
 
 theta = linspace(0, 3.1415/2, 100); %all trig in radians
 
@@ -255,8 +255,8 @@ d = 2.45; %3.052717; % steering length
 l = 0.56; %servo arm length
 r = 0.25; %0.483608; %rudder length
 
-m_1 = 0.242520;
-m_2 = 0.405512; %2
+m_1 = 0.311024;
+m_2 = 0.405394; %2
 
 theta = linspace(0, 3.1415/2, 100); %all trig in radians
 
