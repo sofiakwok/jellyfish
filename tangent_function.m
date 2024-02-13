@@ -221,29 +221,26 @@ theta = linspace(0, 3.1415/2, 100); %all trig in radians
 x_1 = f*sin(theta);
 y_1 = -f*cos(theta);
 
-% calculate beta for alpha to stay at 0 throughout cycle
-alpha = 0/180*3.1415;
-x_2 = r*sin(theta + alpha + 3.1415/2) + x_1;
-y_2 = -r*cos(theta + alpha + 3.1415/2) + y_1;
-% x_2 = (l + f) * sin(theta);
-% y_2 = -(l + f) * cos(theta);
-
-a = (4*l*x_2 - 4*l*m_1).^2;
-b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-top = 0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2; 
-bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-beta = 2*(atan(top./bottom));
-top_2 = -0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2;
-beta_2 = 2*(atan(top_2./bottom));
-
-deg_beta = beta * 180 / 3.1415;
-deg_beta_2 = beta_2 * 180 / 3.1415;
-
 figure(2);
 hold on
-plot(theta*180/3.1415, deg_beta)
-plot(theta*180/3.1415, deg_beta_2)
+% calculate beta for alpha to stay at 0 throughout cycle
+for i = 1:6
+    alpha = i * 10 / 180 * 3.1415;
+    x_2 = r*sin(theta + alpha + 3.1415/2) + x_1;
+    y_2 = -r*cos(theta + alpha + 3.1415/2) + y_1;
+    % x_2 = (l + f) * sin(theta);
+    % y_2 = -(l + f) * cos(theta);
+    
+    a = (4*l*x_2 - 4*l*m_1).^2;
+    b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
+    c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
+    top = 0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2; 
+    bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
+    beta = 2*(atan(top./bottom));
+    deg_beta = beta * 180 / 3.1415;
+    plot(theta*180/3.1415, deg_beta)
+end
+
 xlabel('\theta')
 ylabel('\beta')
 
@@ -263,28 +260,24 @@ theta = linspace(0, 3.1415/2, 100); %all trig in radians
 x_1 = -f*sin(theta);
 y_1 = -f*cos(theta);
 
-% calculate beta for alpha to stay at 0 throughout cycle
-alpha = 0/180*3.1415;
-x_2 = -r* sin(theta + alpha + 3.1415/2) + x_1;
-y_2 = -r * cos(theta + alpha + 3.1415/2) + y_1; 
-% x_2 = (l + f) * sin(theta);
-% y_2 = -(l + f) * cos(theta);
-
-a = (4*l*m_1 - 4*l*x_2).^2;
-b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-top = real(0.5*sqrt(a - 4.*b.*c)) - 2*l*m_1 + 2*l.*x_2; 
-bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-beta = 2*(atan(top./bottom));
-top_2 = -0.5*sqrt(a - 4.*b.*c) - 2*l*m_1 + 2*l.*x_2;
-beta_2 = 2*(atan(top_2./bottom));
-
-deg_beta = beta * 180 / 3.1415;
-deg_beta_2 = beta_2 * 180 / 3.1415;
-
 figure(3);
 hold on
-plot(theta*180/3.1415, deg_beta)
-plot(theta*180/3.1415, deg_beta_2)
+% calculate beta for alpha to stay at 0 throughout cycle
+for i = 1:6
+    alpha = i * 10 / 180 * 3.1415;
+    x_2 = -r* sin(theta + alpha + 3.1415/2) + x_1;
+    y_2 = -r * cos(theta + alpha + 3.1415/2) + y_1; 
+    % x_2 = (l + f) * sin(theta);
+    % y_2 = -(l + f) * cos(theta);
+    
+    a = (4*l*m_1 - 4*l*x_2).^2;
+    b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
+    c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
+    top = real(0.5*sqrt(a - 4.*b.*c)) - 2*l*m_1 + 2*l.*x_2; 
+    bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
+    beta = 2*(atan(top./bottom));
+    deg_beta = beta * 180 / 3.1415;
+    plot(theta*180/3.1415, deg_beta)
+end
 xlabel('\theta')
 ylabel('\beta')
