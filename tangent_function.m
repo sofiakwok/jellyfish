@@ -208,13 +208,13 @@ ylabel('\beta')
 %% fin1 beta right angle
 %graphing beta over the feasible range that x1, y1 can be at
 
-f = 2.15178; % fin length
-d = 2.45; %3.052717; % steering length
-l = 0.56; %servo arm length
-r = 0.25; %0.483608; %rudder length
+f = 2.153604; % fin length
+d = 2.45; % steering length for servo attachment
+l = 0.568898; %servo arm length
+r = 0.2481; %rudder length
 
 m_1 = -0.311024;
-m_2 = 0.405394;
+m_2 = 1.165354;
 
 theta = linspace(0, 3.1415/2, 100); %all trig in radians
 
@@ -222,9 +222,10 @@ x_1 = f*sin(theta);
 y_1 = -f*cos(theta);
 
 figure(2);
+clf;
 hold on
 % calculate beta for alpha to stay at 0 throughout cycle
-for i = 1:6
+for i = 1:9
     alpha = (i-1) * 10 / 180 * 3.1415;
     x_2 = r*sin(theta + alpha + 3.1415/2) + x_1;
     y_2 = -r*cos(theta + alpha + 3.1415/2) + y_1;
@@ -234,9 +235,9 @@ for i = 1:6
     a = (4*l*x_2 - 4*l*m_1).^2;
     b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
     c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-    top = 0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2; 
+    top = real(0.5*sqrt(a - 4.*b.*c)) + 2*l*m_1 - 2*l.*x_2; 
     bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-    top_2 = -0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2;
+    top_2 = real(-0.5*sqrt(a - 4.*b.*c)) + 2*l*m_1 - 2*l.*x_2;
     beta_2 = 2*(atan(top_2./bottom));
     beta = 2*(atan(top./bottom));
     deg_beta = beta * 180 / 3.1415;
@@ -252,13 +253,13 @@ ylabel('\beta')
 %% fin2 beta right angle
 %graphing beta over the feasible range that x1, y1 can be at
 
-f = 2.15178; % fin length
-d = 2.45; %3.052717; % steering length
-l = 0.56; %servo arm length
-r = 0.25; %0.483608; %rudder length
+f = 2.153604; % fin length
+d = 2.45; % steering length for servo attachment
+l = 0.568898; %servo arm length
+r = 0.2481; %rudder length
 
 m_1 = 0.311024;
-m_2 = 0.405394; %2
+m_2 = 1.165354; %2
 
 theta = linspace(0, 3.1415/2, 100); %all trig in radians
 
@@ -266,9 +267,10 @@ x_1 = -f*sin(theta);
 y_1 = -f*cos(theta);
 
 figure(3);
+clf;
 hold on
 % calculate beta for alpha to stay at 0 throughout cycle
-for i = 1:6
+for i = 1:9
     alpha = (i-1) * 10 / 180 * 3.1415;
     x_2 = -r* sin(theta + alpha + 3.1415/2) + x_1;
     y_2 = -r * cos(theta + alpha + 3.1415/2) + y_1; 
@@ -280,7 +282,7 @@ for i = 1:6
     c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
     top = real(0.5*sqrt(a - 4.*b.*c)) - 2*l*m_1 + 2*l.*x_2; 
     bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-    top_2 = -0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2;
+    top_2 = real(-0.5*sqrt(a - 4.*b.*c)) + 2*l*m_1 - 2*l.*x_2;
     beta_2 = 2*(atan(top_2./bottom));
     beta = 2*(atan(top./bottom));
     deg_beta = beta * 180 / 3.1415;
