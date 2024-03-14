@@ -208,7 +208,7 @@ ylabel('\beta')
 %% fin1 beta right angle
 %graphing beta over the feasible range that x1, y1 can be at
 
-f = 2.153604; % fin length
+f = 2.15178; % fin length
 d = 2.45; % steering length for servo attachment
 l = 0.568898; %servo arm length
 r = 0.2481; %rudder length
