@@ -225,7 +225,7 @@ figure(2);
 clf;
 hold on
 % calculate beta for alpha to stay at 0 throughout cycle
-for i = 1:9
+for i = 1:1
     alpha = (i-1) * 10 / 180 * 3.1415;
     x_2 = r*sin(theta + alpha + 3.1415/2) + x_1;
     y_2 = -r*cos(theta + alpha + 3.1415/2) + y_1;
@@ -235,12 +235,12 @@ for i = 1:9
     a = (4*l*x_2 - 4*l*m_1).^2;
     b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
     c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-    top = real(0.5*sqrt(a - 4.*b.*c)) + 2*l*m_1 - 2*l.*x_2; 
+    top = 0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2; 
     bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-    top_2 = real(-0.5*sqrt(a - 4.*b.*c)) + 2*l*m_1 - 2*l.*x_2;
+    top_2 = -0.5*sqrt(a - 4.*b.*c) + 2*l*m_1 - 2*l.*x_2;
     beta_2 = 2*(atan(top_2./bottom));
     beta = 2*(atan(top./bottom));
-    deg_beta = beta * 180 / 3.1415;
+    deg_beta = real(beta) * 180 / 3.1415;
     deg_beta_2 = beta_2 * 180 / 3.1415;
     plot(theta*180/3.1415, deg_beta)
     plot(theta*180/3.1415, deg_beta_2, "--")
@@ -270,7 +270,7 @@ figure(3);
 clf;
 hold on
 % calculate beta for alpha to stay at 0 throughout cycle
-for i = 1:9
+for i = 1:2
     alpha = (i-1) * 10 / 180 * 3.1415;
     x_2 = -r* sin(theta + alpha + 3.1415/2) + x_1;
     y_2 = -r * cos(theta + alpha + 3.1415/2) + y_1; 
@@ -280,12 +280,12 @@ for i = 1:9
     a = (4*l*m_1 - 4*l*x_2).^2;
     b = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
     c = d^2 - l^2 - 2*l*m_2 + 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
-    top = real(0.5*sqrt(a - 4.*b.*c)) - 2*l*m_1 + 2*l.*x_2; 
+    top = 0.5*sqrt(a - 4.*b.*c) - 2*l*m_1 + 2*l.*x_2; 
     bottom = d^2 - l^2 + 2*l*m_2 - 2*l*y_2 - m_1^2 + 2*m_1*x_2 - m_2^2 + 2*m_2*y_2 - x_2.^2 - y_2.^2;
     top_2 = real(-0.5*sqrt(a - 4.*b.*c)) + 2*l*m_1 - 2*l.*x_2;
     beta_2 = 2*(atan(top_2./bottom));
     beta = 2*(atan(top./bottom));
-    deg_beta = beta * 180 / 3.1415;
+    deg_beta = real(beta) * 180 / 3.1415;
     deg_beta_2 = beta_2 * 180 / 3.1415;
     plot(theta*180/3.1415, deg_beta)
     plot(theta*180/3.1415, deg_beta_2, "--")
