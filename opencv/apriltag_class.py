@@ -16,6 +16,13 @@ class AprilTag():
         if not self.cap.isOpened():
             print("Cannot open camera")
             exit()
+
+        # Capture frame-by-frame
+        ret, frame = self.cap.read()
+        # if frame is read correctly ret is True
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+
     def get_position(self):
         # Capture frame-by-frame
         ret, frame = self.cap.read()
