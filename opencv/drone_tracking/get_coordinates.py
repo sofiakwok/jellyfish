@@ -21,11 +21,9 @@ def get_coordinates(R_origin, tvec_origin, rvec_marker, tvec_marker):
     angleMarker = np.arctan2(RMarkerWorld[1][0], RMarkerWorld[0][0])
 
     # since the marker is rotated 45 degrees
-    angleMarker += np.pi/4
-
+    # angleMarker += np.pi/4
     # in degrees
     angleMarker *= 180/np.pi
-
     # round the angle to the nearest integer, no need for precision here
     # angleMarker = round(angleMarker)
 
@@ -38,11 +36,6 @@ def get_coordinates(R_origin, tvec_origin, rvec_marker, tvec_marker):
     # np.linalg.inv(R_origin) = R_origin.T
     posMarkerWorld = np.dot(R_origin.T, posMarkerCam - tvec_origin)
 
-    # round the positions to the nearest integers, no need for precision here
-    # xMarker = round(posMarkerWorld[0])
-    # yMarker = round(posMarkerWorld[1])
-    # zMarker = round(posMarkerWorld[2])
-
     xMarker = posMarkerWorld[0]
     yMarker = posMarkerWorld[1]
     zMarker = posMarkerWorld[2]
@@ -51,4 +44,4 @@ def get_coordinates(R_origin, tvec_origin, rvec_marker, tvec_marker):
     if zMarker < 0:
         zMarker = 0
 
-    return xMarker, yMarker, zMarker, angleMarker
+    return xMarker, yMarker, angleMarker
