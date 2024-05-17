@@ -22,7 +22,7 @@ mtx = calfile['mtx']
 dist = calfile['dist']
 roi = calfile['roi']
 
-# load origin marker pose
+# load origin marker pose #TODO: make origin marker
 origin = np.load('origin.npz')
 rvec_origin = origin['rvec']
 tvec_origin = origin['tvec']

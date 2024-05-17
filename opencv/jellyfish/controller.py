@@ -97,9 +97,24 @@ while not KeyboardInterrupt:
     command = "%i,%i,%i" % (theta, alpha1, alpha2)
 
     # print the projected commands
-    print("[COMMANDS]: theta={:.0f} 1={:.0f} 2={:.0f}".format(theta, alpha1, alpha2))
+    print("[COMMANDS]: theta={:.0f} alpha1={:.0f} alpha2={:.0f}".format(theta, alpha1, alpha2))
 
     # send to Arduino via serial port
     command = command + "\n"
     arduino.write(command.encode())
+
+fps.stop()
+print("[INFO] Elapsed time: {:.2f}".format(fps.elapsed()))
+print("[INFO] Approximate FPS: {:.2f}".format(fps.fps()))
+
+# release capture and close all the windows
+cap.stop()
+
+# release video
+cv2.destroyAllWindows()
+
+# close the connection and reopen it
+arduino.close()
+arduino = serial.Serial(usb_port, 115200, timeout=.01)
+arduino.close()
 
