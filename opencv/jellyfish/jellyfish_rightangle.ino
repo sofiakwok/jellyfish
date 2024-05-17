@@ -1,0 +1,128 @@
+#include <Servo.h>
+#include <Math.h>
+#include <Complex.h>
+
+Servo stroke;  // for controlling stroke motion (symmetrical)
+Servo fin1;
+Servo fin2;
+//beta_1 is left (looking from below), beta_2 is right 
+double beta_1;
+double beta_2;
+//alpha: angle offset of rudders from fins (radians)
+//left = negative, right = positive
+double alpha_1 = 0;
+double alpha_2 = 0;
+double beta_1_offset = 4;
+double beta_2_offset = 9;
+//double k_air = 1.5;
+//theta: angle of middle servo, controls fin angles
+int theta = 0;
+
+char receivedChar;
+bool startLoop = false;
+bool newData = false;
+double delay_time = 3;
+
+double starting_angle = 170;
+
+void setup() {
+  // put your setup code here, to run once:
+  stroke.attach(9); // for controlling theta
+  fin1.attach(10); // for controlling rudder 1
+  fin2.attach(11); // for controlling rudder 2
+  stroke.write(180);
+  fin1.write(180 - starting_angle - beta_1_offset); //because fin1 is flipped
+  fin2.write(starting_angle + beta_2_offset);
+  Serial.begin(9600);
+}
+
+void loop() {
+  // wait until a new command is sent
+  while (!Serial.available()){}
+  while (Serial.available()){
+    str command = Serial.readString();
+    theta = int(command[0]);
+    alpha_1 = int(command[1]);
+    alpha_2 = int(command[2]);
+
+    stroke.write(theta);
+    update_rudders(180 - theta, alpha_1, alpha_2);
+    fin1.write(180 - beta_1 - beta_1_offset);
+    fin2.write(beta_2 + beta_2_offset);  
+  }
+}
+
+void update_rudders(double theta, double alpha_1, double alpha_2){
+  bool left;
+  beta_1 = beta_calc(alpha_1, theta, left=true);
+  //Serial.print((String)"(alpha_1: " + alpha_1 + " theta: " + theta + " beta_1: " + beta_1 + ")");
+  beta_2 = beta_calc(alpha_2, theta, left=false);
+}
+
+double beta_calc(double alpha_deg, double theta_deg, bool left){
+  //convert degrees to radians and account for theta gear ratio
+  double theta = theta_deg * 3.1415/180/2;
+  double alpha = alpha_deg * 3.1415/180;
+  //Serial.print((String)"(theta: " + theta + " alpha: " + alpha + ")");
+  //all measurements in inches and taken from Solidworks
+  double d = 2.45; // length of outer servo attachment to steer rudders 
+  double l = 0.568898; // length of servo arm
+  double r = 0.2481; // length of arm used for changing alpha from rotation axis
+  double fin_len = 2.15178;
+  
+  // offset of servo from fin rotational axis (m_1 = x, m_2 = y)
+  // assumes fin rotational axis is at (0, 0)
+  double m_1 = 0;
+  double m_2 = 0;
+  //given a desired rudder angle (alpha) calculate beta (fin servo angle)
+  double x_1 = 0;
+  double y_1 = 0;
+  double x_2 = 0;
+  double y_2 = 0;
+
+  double a = 0;
+  double b = 0;
+  double c = 0;
+  double root = 0;
+  Complex top(0, 0);
+  Complex bottom(0, 0);
+
+  if (left){ //for fin1 math
+    m_1 = -0.311024;
+    m_2 = 1.165354;
+    x_1 = fin_len*sin(theta);
+    y_1 = -fin_len*cos(theta);
+    x_2 = r*sin(alpha + theta + 3.1415/2) + x_1;
+    y_2 = -r*cos(alpha + theta + 3.1415/2) + y_1;
+    a = pow(4*l*x_2 - 4*l*m_1, 2);
+    b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    root = a - 4*b*c;
+    Complex c(root, 0);
+    top = c.c_sqrt();
+    top *= 0.5;
+    top += 2*l*m_1 - 2*l*x_2; 
+    bottom.set(pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2), 0);
+  } else { // for fin 2
+    m_1 = 0.311024;
+    m_2 = 1.165354;
+    x_1 = -fin_len*sin(theta);
+    y_1 = -fin_len*cos(theta);
+    x_2 = -r*sin(alpha + theta + 3.1415/2) + x_1;
+    y_2 = -r*cos(alpha + theta + 3.1415/2) + y_1;
+    a = pow(4*l*m_1 - 4*l*x_2, 2);
+    b = pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    c = pow(d, 2) - pow(l, 2) - 2*l*m_2 + 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2);
+    root = a - 4*b*c;
+    Complex c(root, 0);
+    top = c.c_sqrt();
+    top *= 0.5;
+    top += -2*l*m_1 + 2*l*x_2; 
+    bottom.set(pow(d, 2) - pow(l, 2) + 2*l*m_2 - 2*l*y_2 - pow(m_1, 2) + 2*m_1*x_2 - pow(m_2, 2) + 2*m_2*y_2 - pow(x_2, 2) - pow(y_2, 2), 0);
+  }
+  Complex fraction = top/bottom;
+  double beta = 2*fraction.c_atan().real();
+  //convert back to degrees 
+  double beta_deg = 180/3.1415*beta;
+  return beta_deg;
+}

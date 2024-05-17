@@ -3,12 +3,12 @@ Uses the serial port to send PPM commands to the drone via an Arduino.
 Uses a different thread to grab frames from the webcam.
 Implements a PID controller."""
 
-from fps import *
-from webcamvideostream import *
+from jellyfish.fps import *
+from jellyfish.webcamvideostream import *
 import cv2
 import cv2.aruco as aruco
 import numpy as np
-from get_coordinates import *
+from jellyfish.get_coordinates import *
 import serial
 import time
 import scipy.io
