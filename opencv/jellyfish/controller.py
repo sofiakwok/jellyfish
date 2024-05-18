@@ -100,7 +100,7 @@ while not KeyboardInterrupt:
     print("[COMMANDS]: theta={:.0f} alpha1={:.0f} alpha2={:.0f}".format(theta, alpha1, alpha2))
 
     # send to Arduino via serial port
-    command = command + "\n"
+    command = command + ",\n"
     arduino.write(command.encode())
 
 fps.stop()

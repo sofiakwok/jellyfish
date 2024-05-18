@@ -1,6 +1,7 @@
 #include <Servo.h>
 #include <Math.h>
 #include <Complex.h>
+#include <String.h>
 
 Servo stroke;  // for controlling stroke motion (symmetrical)
 Servo fin1;
@@ -18,10 +19,11 @@ double beta_2_offset = 9;
 //theta: angle of middle servo, controls fin angles
 int theta = 0;
 
-char receivedChar;
 bool startLoop = false;
 bool newData = false;
 double delay_time = 3;
+
+String readString;
 
 double starting_angle = 170;
 
@@ -39,17 +41,30 @@ void setup() {
 void loop() {
   // wait until a new command is sent
   while (!Serial.available()){}
+  readString = ""
   while (Serial.available()){
-    str command = Serial.readString();
-    theta = int(command[0]);
-    alpha_1 = int(command[1]);
-    alpha_2 = int(command[2]);
-
-    stroke.write(theta);
-    update_rudders(180 - theta, alpha_1, alpha_2);
-    fin1.write(180 - beta_1 - beta_1_offset);
-    fin2.write(beta_2 + beta_2_offset);  
+    if (Serial.available() >0)
+    {
+      char c = Serial.read();  //gets one byte from serial buffer
+      readString += c; //makes the string readString
+    }
   }
+  char* token = strtok(readString, ",")
+  while (token != NULL)
+  {
+    strings[index] = token;
+    index++;
+    token = strtok(NULL, ",");
+  }
+
+  theta = int(command[0]);
+  alpha_1 = int(command[1]);
+  alpha_2 = int(command[2]);
+
+  stroke.write(theta);
+  update_rudders(180 - theta, alpha_1, alpha_2);
+  fin1.write(180 - beta_1 - beta_1_offset);
+  fin2.write(beta_2 + beta_2_offset);  
 }
 
 void update_rudders(double theta, double alpha_1, double alpha_2){
