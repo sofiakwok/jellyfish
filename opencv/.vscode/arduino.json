@@ -1,3 +1,6 @@
 {
-    "board": "arduino:avr:uno"
+    "board": "arduino:avr:uno",
+    "sketch": "jellyfish\\jellyfish.ino",
+    "output": "../ArduinoOutput",
+    "debugger": "jlink"
 }

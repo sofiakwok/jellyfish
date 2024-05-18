@@ -19,13 +19,16 @@ double beta_1_offset = 4;
 double beta_2_offset = 9;
 //double k_air = 1.5;
 //theta: angle of middle servo, controls fin angles
-int theta = 0;
+double theta = 0;
 
 bool startLoop = false;
 bool newData = false;
 double delay_time = 3;
 
-String readString;
+const int BUFFER_SIZE = 15;
+char buf[BUFFER_SIZE];
+char *command[16]; // an array of pointers to the pieces of the above array after strtok()
+char *ptr = NULL;
 
 double starting_angle = 170;
 
@@ -43,25 +46,22 @@ void setup() {
 void loop() {
   // wait until a new command is sent
   while (!Serial.available()){}
-  readString = ""
   while (Serial.available()){
-    if (Serial.available() >0)
-    {
-      char c = Serial.read();  //gets one byte from serial buffer
-      readString += c; //makes the string readString
-    }
+    int message = Serial.readBytesUntil('\n', buf, BUFFER_SIZE);
   }
-  char* token = strtok(readString, ",")
-  while (token != NULL)
+  // split command into separate angle commands using comma
+  ptr = strtok(buf, ","); 
+  int index = 0;
+  while (ptr != NULL)
   {
-    strings[index] = token;
+    command[index] = ptr;
     index++;
-    token = strtok(NULL, ",");
+    ptr = strtok(NULL, ",");
   }
-
-  theta = int(command[0]);
-  alpha_1 = int(command[1]);
-  alpha_2 = int(command[2]);
+  
+  theta = atof(command[0]);
+  alpha_1 = atof(command[1]);
+  alpha_2 = atof(command[2]);
 
   stroke.write(theta);
   update_rudders(180 - theta, alpha_1, alpha_2);
