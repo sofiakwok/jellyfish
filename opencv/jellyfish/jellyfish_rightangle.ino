@@ -1,7 +1,9 @@
+#include <Arduino.h>
 #include <Servo.h>
 #include <Math.h>
 #include <Complex.h>
 #include <String.h>
+#include <HardwareSerial.h>
 
 Servo stroke;  // for controlling stroke motion (symmetrical)
 Servo fin1;
