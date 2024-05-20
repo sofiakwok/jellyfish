@@ -8,14 +8,14 @@ import cv2.aruco as aruco
 import numpy as np
 
 # load the camera calibration parameters
-calfile = np.load('calibration.npz')
+calfile = np.load('opencv/camera_calibration/calibration.npz') #TODO: get actual camera calibration parameters
 newcameramtx = calfile['newcameramtx']
 mtx = calfile['mtx']
 dist = calfile['dist']
 roi = calfile['roi']
 
 # load origin marker pose
-origin = np.load('origin.npz')
+origin = np.load('opencv/camera_calibration/origin.npz')
 rvec_origin = origin['rvec']
 tvec_origin = origin['tvec']
 
@@ -24,7 +24,8 @@ R_origin, jac = cv2.Rodrigues(rvec_origin)
 tvec_origin = np.ndarray.flatten(tvec_origin)
 
 # use a dictionary of 25 3x3 markers
-aruco_dict = aruco.Dictionary_create(25, 3)
+aruco_dict = aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+# aruco_dict = aruco.Dictionary_create(25, 3)
 
 # size of the frames
 width = 640
@@ -38,26 +39,29 @@ map1, map2 = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (width, 
 marker_length = 2.6 # TODO: update when marker is printed
 
 # create the (default) parameters for marker detection
-parameters = aruco.DetectorParameters_create()
+parameters = aruco.DetectorParameters()
 
 # open serial connection with Arduino
 # baudrate of 115200
-usb_port = '/dev/cu.usbmodem1421' #TODO: update port
-arduino = serial.Serial(usb_port, 115200, timeout=.01) #TODO: update baudrate
+usb_port = 'COM2' #TODO: update port
+arduino = serial.Serial(port=usb_port, baudrate=115200, timeout=.01) #TODO: update baudrate
 time.sleep(2)
 
 # start the capture (on camera channel 0) thread
+print("starting capture")
 cap = WebcamVideoStream(src=0).start()
 # wait one second for everything to settle before reading first frame
 time.sleep(1)
 
 # start FPS counter
+print("starting FPS")
 fps = FPS()
 fps.start()
 
 marker_id = 2 #TODO: update when marker is printed
 
 while not KeyboardInterrupt:
+    print("reading frame:")
     frame = cap.read()
     
     undistorted = cv2.remap(frame, map1, map2, cv2.INTER_LINEAR)
@@ -90,6 +94,7 @@ while not KeyboardInterrupt:
                 x, y, angle = get_coordinates(R_origin, tvec_origin, rvec, tvec)
 
     #TODO: get controller (JJ's job?)
+    #TODO: save jellyfish position
     theta = 0
     alpha1 = 0
     alpha2 = 0

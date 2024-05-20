@@ -5,6 +5,9 @@
 #include <String.h>
 #include <HardwareSerial.h>
 
+// Arduino code to control stroke and rudder angles.
+// Takes in a command from python using serial and uses that to determine controls. 
+
 Servo stroke;  // for controlling stroke motion (symmetrical)
 Servo fin1;
 Servo fin2;
