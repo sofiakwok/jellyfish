@@ -23,7 +23,7 @@ tvec_origin = origin['tvec']
 R_origin, jac = cv2.Rodrigues(rvec_origin)
 tvec_origin = np.ndarray.flatten(tvec_origin)
 
-# use a dictionary of 25 3x3 markers
+# use a dictionary of 50 4x4 markers
 aruco_dict = aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
 # aruco_dict = aruco.Dictionary_create(25, 3)
 
@@ -37,6 +37,7 @@ map1, map2 = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (width, 
 # size of the drone marker
 # same unit as the unit of the world frame coordinates
 marker_length = 2.6 # TODO: update when marker is printed
+#TODO: find units
 
 # create the (default) parameters for marker detection
 parameters = aruco.DetectorParameters()
@@ -44,7 +45,7 @@ parameters = aruco.DetectorParameters()
 # open serial connection with Arduino
 # baudrate of 115200
 usb_port = 'COM2' #TODO: update port
-arduino = serial.Serial(port=usb_port, baudrate=115200, timeout=.01) #TODO: update baudrate
+arduino = serial.Serial(port=usb_port, baudrate=115200, timeout=.01) #TODO: update baudrate?
 time.sleep(2)
 
 # start the capture (on camera channel 0) thread
@@ -59,6 +60,12 @@ fps = FPS()
 fps.start()
 
 marker_id = 2 #TODO: update when marker is printed
+
+# save x y theta history
+x_hist = []
+y_hist = []
+theta_hist = []
+savedata = False
 
 while not KeyboardInterrupt:
     print("reading frame:")
@@ -79,22 +86,21 @@ while not KeyboardInterrupt:
     if ids is not None:
         # go through the ids
         for i in range(len(ids)):
-            # if the drone marker is detected, get its world coordinates and orientation
+            # if the marker is detected, get its world coordinates and orientation
             if ids[i] == marker_id:
                 detected = True
                 frames_without_jellyfish = 0
-                # estimate the drone marker pose wrt to the camera
+                # estimate the marker pose wrt to the camera
                 # dist = None because we already give the function an undistorted image
                 rvec, tvec = aruco.estimatePoseSingleMarkers([corners[i]], marker_length, mtx, None)
-                # draw the drone marker
+                # draw the marker
                 withMarkers = aruco.drawDetectedMarkers(cropped, [corners[i]], ids[i], (0, 255, 0))
                 # draw its axis
                 withMarkers = aruco.drawAxis(withMarkers, mtx, None, rvec, tvec, marker_length*2)
-                # get the coordinates and orientation of the drone
+                # get the coordinates and orientations
                 x, y, angle = get_coordinates(R_origin, tvec_origin, rvec, tvec)
 
     #TODO: get controller (JJ's job?)
-    #TODO: save jellyfish position
     theta = 0
     alpha1 = 0
     alpha2 = 0
@@ -108,9 +114,21 @@ while not KeyboardInterrupt:
     command = command + ",\n"
     arduino.write(command.encode())
 
+    # save data
+    if savedata:
+        x_hist.append(x)
+        y_hist.append(y)
+        theta_hist.append(theta)
+
 fps.stop()
 print("[INFO] Elapsed time: {:.2f}".format(fps.elapsed()))
 print("[INFO] Approximate FPS: {:.2f}".format(fps.fps()))
+
+# save data
+if savedata:
+    np.savetxt("data/x_hist.txt", x_hist)
+    np.savetxt("data/y_hist.txt", y_hist)
+    np.savetxt("data/theta_hist.txt", theta_hist)
 
 # release capture and close all the windows
 cap.stop()
@@ -118,8 +136,10 @@ cap.stop()
 # release video
 cv2.destroyAllWindows()
 
-# close the connection and reopen it
+# close the connection to arduino
 arduino.close()
 arduino = serial.Serial(usb_port, 115200, timeout=.01)
 arduino.close()
+
+print("finished")
 
