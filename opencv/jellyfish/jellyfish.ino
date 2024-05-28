@@ -52,6 +52,7 @@ void loop() {
   while (Serial.available()){
     int message = Serial.readBytesUntil('\n', buf, BUFFER_SIZE);
   }
+  long int t1 = millis();
   // split command into separate angle commands using comma
   ptr = strtok(buf, ","); 
   int index = 0;
@@ -70,6 +71,8 @@ void loop() {
   update_rudders(180 - theta, alpha_1, alpha_2);
   fin1.write(180 - beta_1 - beta_1_offset);
   fin2.write(beta_2 + beta_2_offset);  
+  long int t2 = millis();
+  Serial.print("Time taken by the task: "); Serial.print(t2-t1); Serial.println(" milliseconds");
 }
 
 void old_loop() {
