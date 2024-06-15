@@ -52,7 +52,6 @@ void loop() {
   while (Serial.available()){
     int message = Serial.readBytesUntil('\n', buf, BUFFER_SIZE);
   }
-  long int t1 = millis();
   // split command into separate angle commands using comma
   ptr = strtok(buf, ","); 
   int index = 0;
@@ -71,38 +70,6 @@ void loop() {
   update_rudders(180 - theta, alpha_1, alpha_2);
   fin1.write(180 - beta_1 - beta_1_offset);
   fin2.write(beta_2 + beta_2_offset);  
-  long int t2 = millis();
-  Serial.print("Time taken by the task: "); Serial.print(t2-t1); Serial.println(" milliseconds");
-}
-
-void old_loop() {
-    // stroke continuously scans from 0 to 180 degrees
-    // fins actually go from 0 to 90 because of the 2:1 gear ratio
-    // jellyfish can do 60 deg in 0.1 sec
-  while(true){
-    //Serial.print("\n Loop 1 \n");
-    for(theta = 180; theta > 0; theta--)  
-    {              
-      stroke.write(theta);
-      update_rudders(180 - theta, alpha_1, alpha_2);
-      //Serial.print(beta_2);
-      //Serial.print(" ");
-      fin1.write(180 - beta_1 - beta_1_offset);
-      fin2.write(beta_2 + beta_2_offset);                
-      delay(delay_time);                   
-    } 
-    //Serial.print("\n Loop 2 \n");
-    for(theta = 0; theta < 180; theta++)    
-    {                           
-      stroke.write(theta);
-      update_rudders(180 - theta, alpha_1, alpha_2);
-      //Serial.print(beta_2);
-      //Serial.print(" ");
-      fin1.write(180 - beta_1 - beta_1_offset);
-      fin2.write(beta_2 + beta_2_offset);           
-      delay(delay_time);       
-    }
-  }
 }
 
 void update_rudders(double theta, double alpha_1, double alpha_2){

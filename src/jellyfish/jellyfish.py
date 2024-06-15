@@ -34,7 +34,7 @@ height = 480
 # create the mappings to undistort the frames
 map1, map2 = cv2.initUndistortRectifyMap(mtx, dist, None, newcameramtx, (width, height), cv2.CV_32FC1)
 
-# size of the drone marker
+# size of the marker
 # same unit as the unit of the world frame coordinates
 marker_length = 2.6 # TODO: update when marker is printed
 #TODO: find units
@@ -100,7 +100,7 @@ while not KeyboardInterrupt:
                 # get the coordinates and orientations
                 x, y, angle = get_coordinates(R_origin, tvec_origin, rvec, tvec)
 
-    #TODO: get controller (JJ's job?)
+    #TODO: write controller (JJ's job?)
     theta = 0
     alpha1 = 0
     alpha2 = 0
