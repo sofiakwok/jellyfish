@@ -7,6 +7,7 @@ import cv2
 import cv2.aruco as aruco
 import numpy as np
 
+
 # load the camera calibration parameters
 calfile = np.load('opencv/camera_calibration/calibration.npz') #TODO: get actual camera calibration parameters
 newcameramtx = calfile['newcameramtx']
@@ -42,12 +43,6 @@ marker_length = 2.6 # TODO: update when marker is printed
 # create the (default) parameters for marker detection
 parameters = aruco.DetectorParameters()
 
-# open serial connection with Arduino
-# baudrate of 115200
-usb_port = 'COM2' #TODO: update port
-arduino = serial.Serial(port=usb_port, baudrate=115200, timeout=.01) #TODO: update baudrate?
-time.sleep(2)
-
 # start the capture (on camera channel 0) thread
 print("starting capture")
 cap = WebcamVideoStream(src=0).start()
@@ -60,6 +55,12 @@ fps = FPS()
 fps.start()
 
 marker_id = 2 #TODO: update when marker is printed
+
+# open serial connection with Arduino
+# baudrate of 115200
+usb_port = 'COM8' 
+arduino = serial.Serial(port=usb_port, baudrate=115200, timeout=.01) #TODO: update baudrate?
+time.sleep(2)
 
 # save x y theta history
 x_hist = []
@@ -99,7 +100,7 @@ while not KeyboardInterrupt:
                 withMarkers = aruco.drawAxis(withMarkers, mtx, None, rvec, tvec, marker_length*2)
                 # get the coordinates and orientations
                 x, y, angle = get_coordinates(R_origin, tvec_origin, rvec, tvec)
-
+    
     #TODO: write controller (JJ's job?)
     theta = 0
     alpha1 = 0
@@ -124,17 +125,17 @@ fps.stop()
 print("[INFO] Elapsed time: {:.2f}".format(fps.elapsed()))
 print("[INFO] Approximate FPS: {:.2f}".format(fps.fps()))
 
-# save data
-if savedata:
-    np.savetxt("data/x_hist.txt", x_hist)
-    np.savetxt("data/y_hist.txt", y_hist)
-    np.savetxt("data/theta_hist.txt", theta_hist)
-
 # release capture and close all the windows
 cap.stop()
 
 # release video
 cv2.destroyAllWindows()
+
+# save data
+if savedata:
+    np.savetxt("data/x_hist.txt", x_hist)
+    np.savetxt("data/y_hist.txt", y_hist)
+    np.savetxt("data/theta_hist.txt", theta_hist)
 
 # close the connection to arduino
 arduino.close()
