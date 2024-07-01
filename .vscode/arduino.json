@@ -1,4 +1,5 @@
 {
     "board": "arduino:avr:uno",
-    "sketch": "opencv\\jellyfish\\jellyfish.ino"
+    "sketch": "src\\jellyfish\\jellyfish.ino",
+    "port": "COM8"
 }
